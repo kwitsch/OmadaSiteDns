@@ -8,19 +8,19 @@ import (
 	"github.com/kwitsch/OmadaSiteDns/cache"
 	"github.com/kwitsch/OmadaSiteDns/config"
 	"github.com/kwitsch/OmadaSiteDns/osdutils"
-	"github.com/kwitsch/omadaclient/apiclient"
+	"github.com/kwitsch/omadaclient"
 	"github.com/kwitsch/omadaclient/log"
 )
 
 type Crawler struct {
-	api   *apiclient.Apiclient
+	api   *omadaclient.SiteClient
 	cache *cache.Cache
 	cfg   *config.Crawler
 	l     *log.Log
 	Error chan (error)
 }
 
-func New(api *apiclient.Apiclient, cache *cache.Cache, cfg *config.Crawler, verbose bool) *Crawler {
+func New(api *omadaclient.SiteClient, cache *cache.Cache, cfg *config.Crawler, verbose bool) *Crawler {
 	return &Crawler{
 		api:   api,
 		cache: cache,
@@ -53,7 +53,7 @@ func (c *Crawler) Close() {
 func (c *Crawler) fetch() {
 	c.l.M("Start fetching data", time.Now())
 
-	clients, err := c.api.Clients()
+	clients, err := c.api.GetClients(false)
 	if c.failed(err) {
 		return
 	}
@@ -74,7 +74,7 @@ func (c *Crawler) fetch() {
 
 	if c.cfg.Gateway.Include {
 		c.l.V("Fetch gateway")
-		devices, err := c.api.DevicesDetailed()
+		devices, err := c.api.GetDevices(true)
 		if c.failed(err) {
 			return
 		}
