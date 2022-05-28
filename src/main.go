@@ -9,7 +9,7 @@ import (
 	"github.com/kwitsch/OmadaSiteDns/config"
 	"github.com/kwitsch/OmadaSiteDns/crawler"
 	"github.com/kwitsch/OmadaSiteDns/server"
-	"github.com/kwitsch/omadaclient/apiclient"
+	"github.com/kwitsch/omadaclient"
 	"github.com/kwitsch/omadaclient/log"
 
 	_ "github.com/kwitsch/go-dockerutils"
@@ -24,7 +24,7 @@ func main() {
 
 	l := log.New("OmadaSiteDns", cfg.Verbose)
 
-	api, err := apiclient.New(cfg.Site.Url, cfg.Site.Site,
+	api, err := omadaclient.NewSiteClient(cfg.Site.Url, cfg.Site.Site,
 		cfg.Site.Username, cfg.Site.Password,
 		cfg.Site.SkipVerify, cfg.Verbose)
 
