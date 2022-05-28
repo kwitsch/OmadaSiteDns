@@ -38,6 +38,8 @@ type Crawler struct {
 
 type Server struct {
 	Ttl time.Duration `koan:"ttl" default:"5m"`
+	Udp bool          `koanf:"udp" default:"true"`
+	Tcp bool          `koanf:"tcp" default:"true"`
 }
 
 const prefix = "OSD_"
