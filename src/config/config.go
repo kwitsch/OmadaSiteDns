@@ -21,7 +21,7 @@ type Site struct {
 	Site       string `koanf:"site"`
 	Username   string `koanf:"username"`
 	Password   string `koanf:"password"`
-	SkipVerify bool   `koanf:"skipverify"`
+	SkipVerify bool   `koanf:"skipverify" default:"false"`
 }
 
 type Crawler struct {
