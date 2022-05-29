@@ -15,7 +15,7 @@ type Server struct {
 	udp   *dns.Server
 	tcp   *dns.Server
 	cache *cache.Cache
-	ttl   uint32
+	cfg   *config.Server
 	l     *log.Log
 	Error chan (error)
 }
@@ -25,7 +25,7 @@ func New(cache *cache.Cache, cfg config.Server, verbose bool) *Server {
 		udp:   createUDPServer(),
 		tcp:   createTCPServer(),
 		cache: cache,
-		ttl:   uint32(cfg.Ttl),
+		cfg:   &cfg,
 		l:     log.New("Server", verbose),
 		Error: make(chan error, 2),
 	}
@@ -36,25 +36,37 @@ func New(cache *cache.Cache, cfg config.Server, verbose bool) *Server {
 }
 
 func (s *Server) Start() {
-	go func() {
-		s.Error <- s.udp.ListenAndServe()
-	}()
-	go func() {
-		s.Error <- s.tcp.ListenAndServe()
-	}()
+	if s.cfg.Udp {
+		go func() {
+			s.Error <- s.udp.ListenAndServe()
+		}()
+	}
+	if s.cfg.Tcp {
+		go func() {
+			s.Error <- s.tcp.ListenAndServe()
+		}()
+	}
 }
 
 func (s *Server) Stop() {
-	s.udp.Shutdown()
-	s.tcp.Shutdown()
+	if s.cfg.Udp {
+		s.udp.Shutdown()
+	}
+	if s.cfg.Tcp {
+		s.tcp.Shutdown()
+	}
 }
 
 func (s *Server) setupHandlers() {
-	uh := s.udp.Handler.(*dns.ServeMux)
-	uh.HandleFunc(".", s.OnRequest)
+	if s.cfg.Udp {
+		uh := s.udp.Handler.(*dns.ServeMux)
+		uh.HandleFunc(".", s.OnRequest)
+	}
 
-	th := s.tcp.Handler.(*dns.ServeMux)
-	th.HandleFunc(".", s.OnRequest)
+	if s.cfg.Tcp {
+		th := s.tcp.Handler.(*dns.ServeMux)
+		th.HandleFunc(".", s.OnRequest)
+	}
 }
 
 func createUDPServer() *dns.Server {
@@ -103,7 +115,7 @@ func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 					Name:   q.Name,
 					Rrtype: dns.TypePTR,
 					Class:  dns.ClassINET,
-					Ttl:    s.ttl,
+					Ttl:    uint32(s.cfg.Ttl),
 				}
 
 				rr.Ptr = fmt.Sprintf("%s.", val)
@@ -120,7 +132,7 @@ func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 					Name:   q.Name,
 					Rrtype: dns.TypeA,
 					Class:  dns.ClassINET,
-					Ttl:    s.ttl,
+					Ttl:    uint32(s.cfg.Ttl),
 				}
 
 				rr.A = net.ParseIP(val)

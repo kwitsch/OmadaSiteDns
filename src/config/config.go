@@ -38,6 +38,8 @@ type Crawler struct {
 
 type Server struct {
 	Ttl time.Duration `koan:"ttl" default:"5m"`
+	Udp bool          `koanf:"udp" default:"true"`
+	Tcp bool          `koanf:"tcp" default:"true"`
 }
 
 const prefix = "OSD_"
@@ -48,8 +50,20 @@ func Get() (*Config, error) {
 		return nil, err
 	}
 
-	if len(res.Site.Url) == 0 {
+	if strIsNotSet(res.Site.Url) {
 		return nil, utils.NewError("No Omada controller url set")
+	}
+
+	if strIsNotSet(res.Site.Username) {
+		return nil, utils.NewError("No username set")
+	}
+
+	if strIsNotSet(res.Site.Password) {
+		return nil, utils.NewError("No password set")
+	}
+
+	if !res.Server.Udp && !res.Server.Tcp {
+		return nil, utils.NewError("No server enabled")
 	}
 
 	for k, v := range res.Crawler.Converters {
@@ -59,7 +73,11 @@ func Get() (*Config, error) {
 	}
 
 	if res.Verbose {
-		fmt.Println("Config:", res)
+		fmt.Println("Config:", utils.ToString(res))
 	}
 	return &res, nil
+}
+
+func strIsNotSet(input string) bool {
+	return (len(input) > 0)
 }
