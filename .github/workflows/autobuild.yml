@@ -41,8 +41,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
-        name: Install cross compiler 
-        run: sudo apt install -y gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+        name: Install packages 
+        run: sudo apt install -y gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross ca-certificates
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
