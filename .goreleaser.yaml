@@ -25,7 +25,6 @@ builds:
       - 7
     mod_timestamp: "{{ .CommitTimestamp }}"
 dockers:
-  # https://goreleaser.com/customization/docker/
   - use: buildx
     goos: linux
     goarch: amd64
@@ -77,7 +76,6 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
 docker_manifests:
-  # https://goreleaser.com/customization/docker_manifest/
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}
     image_templates:
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-amd64
@@ -90,12 +88,3 @@ docker_manifests:
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-arm64v8
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv6
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv7
-checksum:
-  # https://goreleaser.com/customization/checksum/
-  name_template: 'checksums.txt'
-snapshot:
-  # https://goreleaser.com/customization/snapshots/
-  name_template: "{{ incpatch .Version }}-SNAPSHOT"
-source:
-  # https://goreleaser.com/customization/source/
-  enabled: true
