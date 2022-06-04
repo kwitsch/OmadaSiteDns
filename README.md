@@ -76,8 +76,6 @@ services:
       - OSD_CRAWLER_CONVERTERS_2_SUBSTITUTE=ae
       - OSD_CRAWLER_CONVERTERS_3_REGEX=ö
       - OSD_CRAWLER_CONVERTERS_3_SUBSTITUTE=oe
-    # add site gateway
-      - OSD_CRAWLER_GATEWAY_INCLUDE=True
     # override domain for network LAN to local
       - OSD_CRAWLER_NETWORK_1_NAME=LAN
       - OSD_CRAWLER_NETWORK_1_DOMAIN=local
