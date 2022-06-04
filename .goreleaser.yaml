@@ -9,6 +9,9 @@ builds:
     binary: omadasitedns
     env:
       - CGO_ENABLED=0
+      - CXX=g++
+      - GOGCCFLAGS=-fPIC -marm -fmessage-length=0
+      - CC=gcc
     ldflags:
       - -linkmode external -extldflags -static
     goos:

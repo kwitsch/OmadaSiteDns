@@ -40,6 +40,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - 
+        name: Install cross compiler 
+        run: apt install gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
