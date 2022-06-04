@@ -42,7 +42,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
         name: Install packages 
-        run: sudo apt install -y gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross ca-certificates
+        run: sudo apt install -y gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross libc6-dev-amd64-cross
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2

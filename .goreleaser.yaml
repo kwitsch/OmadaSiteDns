@@ -4,6 +4,7 @@ before:
     - sh -c "cd ./src && go get github.com/ramr/go-reaper"
     - sh -c "cd ./src && go mod tidy"
     - sh -c "cd ./src && go mod download"
+    - sh -c "sudo apt install -y ca-certificates"
 builds:
   - dir: src
     binary: omadasitedns
@@ -12,8 +13,8 @@ builds:
       - CXX=g++
       - GOGCCFLAGS=-fPIC -marm -fmessage-length=0
       - CC=gcc
-#    ldflags:
-#      - -linkmode external -extldflags -static
+    ldflags:
+      - -linkmode external -extldflags -static
     goos:
       - linux
     goarch:
