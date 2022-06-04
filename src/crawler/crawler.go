@@ -7,40 +7,56 @@ import (
 
 	"github.com/kwitsch/OmadaSiteDns/cache"
 	"github.com/kwitsch/OmadaSiteDns/config"
+	"github.com/kwitsch/OmadaSiteDns/domainstore"
 	"github.com/kwitsch/OmadaSiteDns/osdutils"
 	"github.com/kwitsch/omadaclient"
 	"github.com/kwitsch/omadaclient/log"
 )
 
 type Crawler struct {
-	api   *omadaclient.SiteClient
-	cache *cache.Cache
-	cfg   *config.Crawler
-	l     *log.Log
-	Error chan (error)
+	api     *omadaclient.SiteClient
+	cache   *cache.Cache
+	cfg     *config.Crawler
+	l       *log.Log
+	domains *domainstore.Domainstore
+	Error   chan (error)
 }
 
 func New(api *omadaclient.SiteClient, cache *cache.Cache, cfg *config.Crawler, verbose bool) *Crawler {
-	return &Crawler{
-		api:   api,
-		cache: cache,
-		cfg:   cfg,
-		l:     log.New("Crawler", verbose),
-		Error: make(chan error, 2),
+	res := Crawler{
+		api:     api,
+		cache:   cache,
+		cfg:     cfg,
+		l:       log.New("Crawler", verbose),
+		domains: domainstore.New(verbose),
+		Error:   make(chan error, 2),
 	}
+
+	for _, n := range cfg.Network {
+		res.domains.AddOverride(n.Name, n.Domain)
+	}
+
+	return &res
 }
 
 func (c *Crawler) Start() {
 	go func() {
-		c.fetch()
+		c.fetchNetworks()
+		c.fetchHosts()
 
-		ticker := time.NewTicker(c.cfg.Intervall)
-		defer ticker.Stop()
+		hostTicker := time.NewTicker(c.cfg.HostIntervall)
+		defer hostTicker.Stop()
+
+		networkTicker := time.NewTicker(c.cfg.NetworkIntervall)
+		defer networkTicker.Stop()
 
 		for {
 			select {
-			case <-ticker.C:
-				c.fetch()
+			case <-networkTicker.C:
+				hostTicker.Reset(c.cfg.HostIntervall)
+				c.fetchNetworks()
+			case <-hostTicker.C:
+				c.fetchHosts()
 			}
 		}
 	}()
@@ -50,8 +66,26 @@ func (c *Crawler) Close() {
 	close(c.Error)
 }
 
-func (c *Crawler) fetch() {
-	c.l.M("Start fetching data", time.Now())
+func (c *Crawler) fetchNetworks() {
+	c.l.M("Start fetching networks", time.Now())
+
+	networks, err := c.api.GetNetworks()
+	if c.failed(err) {
+		return
+	}
+
+	defer c.api.Close()
+
+	for _, n := range *networks {
+		err := c.domains.AddNetwork(n.Name, n.GatewaySubnet, n.Domain)
+		if c.failed(err) {
+			return
+		}
+	}
+}
+
+func (c *Crawler) fetchHosts() {
+	c.l.M("Start fetching hosts", time.Now())
 
 	clients, err := c.api.GetClients(false)
 	if c.failed(err) {
@@ -63,41 +97,32 @@ func (c *Crawler) fetch() {
 	c.l.V("Fetched Clients:", len(*clients))
 
 	for _, cl := range *clients {
-		hname := c.convertName(cl.Name)
-		c.l.V("Fetch:", cl.IP, "-", hname)
-		if osdutils.ValidDnsStr(hname) {
-			c.cache.Update(hname, cl.IP)
+		domname, ok := c.getDomName(cl.Name, cl.IP)
+		if ok {
+			c.addIfValid(domname, cl.IP)
 		} else {
-			c.l.M("Invalid hostname:", hname)
+			c.l.V("No network found for IP:", cl.IP)
 		}
 	}
 
-	if c.cfg.Gateway.Include {
-		c.l.V("Fetch gateway")
-		devices, err := c.api.GetDevices(true)
-		if c.failed(err) {
-			return
-		}
+	c.l.V("Fetch devices")
+	devices, err := c.api.GetDevices(true)
+	if c.failed(err) {
+		return
+	}
 
-		ips := []string{}
-		for _, d := range *devices {
-			if d.Type == "gateway" {
-				gname := c.convertName(d.Name)
-				c.l.V("Gateway name:", gname)
-				for _, lcs := range d.LanClientStats {
-					c.l.V("-", lcs.LanName, ":", lcs.IP)
-					if len(c.cfg.Gateway.PrimaryNet) > 0 && c.cfg.Gateway.PrimaryNet == lcs.LanName {
-						ips = append([]string{lcs.IP}, ips...)
-					} else {
-						ips = append(ips, lcs.IP)
-					}
+	for _, d := range *devices {
+		if d.Type == "gateway" {
+			for _, lcs := range d.LanClientStats {
+				domname, ok := c.getDomName(d.Name, lcs.IP)
+				if ok {
+					c.addIfValid(domname, lcs.IP)
+				} else {
+					c.l.V("No network found for IP:", lcs.IP)
 				}
-
-				c.l.V("Primary address:", ips[0])
-
-				c.cache.Update(gname, ips...)
-				break
 			}
+
+			break
 		}
 	}
 
@@ -110,6 +135,27 @@ func (c *Crawler) failed(err error) bool {
 		return true
 	}
 	return false
+}
+
+func (c *Crawler) getDomName(name, ip string) (string, bool) {
+	dom, ok := c.domains.GetDomain(ip)
+	if ok {
+		res := c.convertName(name)
+		if len(dom) > 0 {
+			res += "." + dom
+		}
+		return res, true
+	}
+	return "", false
+}
+
+func (c *Crawler) addIfValid(name, ip string) {
+	c.l.V("Fetch:", ip, "-", name)
+	if osdutils.ValidDnsStr(name) {
+		c.cache.Update(name, ip)
+	} else {
+		c.l.M("Invalid hostname:", name)
+	}
 }
 
 func (c *Crawler) convertName(name string) string {
