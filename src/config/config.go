@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	Verbose bool    `koanf:"verbose" default:"false"`
+	Verbose int     `koanf:"verbose" default:"0"`
 	Site    Site    `koanf:"site"`
 	Crawler Crawler `koanf:"crawler"`
 	Server  Server  `koanf:"server"`
@@ -25,15 +25,16 @@ type Site struct {
 }
 
 type Crawler struct {
-	Intervall  time.Duration `koan:"intervall" default:"5m"`
-	Converters map[int]struct {
+	HostIntervall    time.Duration `koan:"hostintervall" default:"5m"`
+	NetworkIntervall time.Duration `koan:"networkintervall" default:"60m"`
+	Converters       map[int]struct {
 		Regex      string `koan:"regex"`
 		Substitute string `koan:"substitute"`
 	} `koan:"converters"`
-	Gateway struct {
-		Include    bool   `koanf:"include" default:"false"`
-		PrimaryNet string `koan:"primarynet"`
-	} `koan:"gateway"`
+	Network map[int]struct {
+		Name   string `koan:"name"`
+		Domain string `koan:"domain"`
+	} `koan:"network"`
 }
 
 type Server struct {
@@ -72,12 +73,18 @@ func Get() (*Config, error) {
 		}
 	}
 
-	if res.Verbose {
+	for k, v := range res.Crawler.Network {
+		if !osdutils.ValidDnsStr(v.Domain) {
+			return nil, utils.NewError("Network", "-", k, "("+v.Name+")", "has invalid domain override:", v.Domain)
+		}
+	}
+
+	if res.Verbose > 1 {
 		fmt.Println("Config:", utils.ToString(res))
 	}
 	return &res, nil
 }
 
 func strIsNotSet(input string) bool {
-	return (len(input) > 0)
+	return (len(input) == 0)
 }

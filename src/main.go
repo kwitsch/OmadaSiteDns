@@ -22,11 +22,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	l := log.New("OmadaSiteDns", cfg.Verbose)
+	l := log.New("OmadaSiteDns", (cfg.Verbose > 0))
 
 	api, err := omadaclient.NewSiteClient(cfg.Site.Url, cfg.Site.Site,
 		cfg.Site.Username, cfg.Site.Password,
-		cfg.Site.SkipVerify, cfg.Verbose)
+		cfg.Site.SkipVerify, (cfg.Verbose > 1))
 
 	if err != nil {
 		l.E(err)
@@ -37,10 +37,10 @@ func main() {
 
 	cache := cache.New()
 
-	crawler := crawler.New(api, cache, &cfg.Crawler, cfg.Verbose)
+	crawler := crawler.New(api, cache, &cfg.Crawler, (cfg.Verbose > 0))
 	defer crawler.Close()
 
-	server := server.New(cache, cfg.Server, cfg.Verbose)
+	server := server.New(cache, cfg.Server, (cfg.Verbose > 0))
 	defer server.Stop()
 	server.Start()
 
