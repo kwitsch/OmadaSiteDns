@@ -28,8 +28,6 @@ builds:
       - 6
       - 7
     mod_timestamp: "{{ .CommitTimestamp }}"
-release:
-  draft: true
 archives:
   - replacements:
       linux: Linux
