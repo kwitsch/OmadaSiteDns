@@ -1,16 +1,15 @@
 project_name: omadasitedns
 before:
   hooks:
-    - sh -c "sudo apt update"
-    - sh -c "sudo apt install -y build-essential"
-    - sh -c "cd ./src && go get github.com/ramr/go-reaper"
-    - sh -c "cd ./src && go get -u github.com/breml/rootcerts"
-    - sh -c "cd ./src && go mod download"
-    - sh -c "cd ./src && go mod verify"
-    - sh -c "cd ./src && go mod tidy"
+    - sudo apt update
+    - sudo apt install -y build-essential
+    - go get github.com/ramr/go-reaper
+    - go get -u github.com/breml/rootcerts
+    - go mod download
+    - go mod verify
+    - go mod tidy
 builds:
-  - dir: src
-    binary: omadasitedns
+  - binary: omadasitedns
     env:
       - CGO_ENABLED=0
       - GO_ROOTCERTS_ENABLE=1
@@ -33,7 +32,7 @@ archives:
       linux: Linux
       amd64: x86_64
 snapshot:
-  name_template: "{{ .Tag }}-{{.ShortCommit}}"
+  name_template: "edge"
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
 changelog:
