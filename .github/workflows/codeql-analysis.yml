@@ -42,16 +42,6 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
-
-      - name: Setup Golang caches ⚙
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-golang-${{ hashFiles('**/src/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-golang-
           
       - name: Autobuild
         uses: github/codeql-action/autobuild@v2
