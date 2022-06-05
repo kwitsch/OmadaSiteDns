@@ -12,6 +12,9 @@ import (
 	"github.com/kwitsch/omadaclient"
 	"github.com/kwitsch/omadaclient/log"
 
+	_ "time/tzdata"
+
+	_ "github.com/breml/rootcerts"
 	_ "github.com/kwitsch/go-dockerutils"
 )
 

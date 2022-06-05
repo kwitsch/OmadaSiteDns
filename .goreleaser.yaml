@@ -1,20 +1,22 @@
 project_name: omadasitedns
 before:
   hooks:
+    - sh -c "sudo apt update"
+    - sh -c "sudo apt install -y build-essential"
     - sh -c "cd ./src && go get github.com/ramr/go-reaper"
-    - sh -c "cd ./src && go mod tidy"
+    - sh -c "cd ./src && go get -u github.com/breml/rootcerts"
     - sh -c "cd ./src && go mod download"
-    - sh -c "sudo apt install -y ca-certificates"
+    - sh -c "cd ./src && go mod verify"
 builds:
   - dir: src
     binary: omadasitedns
     env:
       - CGO_ENABLED=0
-      - CXX=g++
-      - GOGCCFLAGS=-fPIC -marm -fmessage-length=0
-      - CC=gcc
-#    ldflags:
-#      - -linkmode external -extldflags -static
+      - GO_ROOTCERTS_ENABLE=1
+    ldflags:
+      - -w
+      - -s
+      - -extldflags "-static"
     goos:
       - linux
     goarch:
