@@ -1,16 +1,17 @@
 project_name: omadasitedns
+
 before:
   hooks:
-    - sh -c "sudo apt update"
-    - sh -c "sudo apt install -y build-essential"
-    - sh -c "cd ./src && go get github.com/ramr/go-reaper"
-    - sh -c "cd ./src && go get -u github.com/breml/rootcerts"
-    - sh -c "cd ./src && go mod download"
-    - sh -c "cd ./src && go mod verify"
-    - sh -c "cd ./src && go mod tidy"
+    - sudo apt update
+    - sudo apt install -y build-essential
+    - go get github.com/ramr/go-reaper
+    - go get -u github.com/breml/rootcerts
+    - go mod download
+    - go mod verify
+    - go mod tidy
+
 builds:
-  - dir: src
-    binary: omadasitedns
+  - binary: omadasitedns
     env:
       - CGO_ENABLED=0
       - GO_ROOTCERTS_ENABLE=1
@@ -28,20 +29,22 @@ builds:
       - 6
       - 7
     mod_timestamp: "{{ .CommitTimestamp }}"
+
 archives:
   - replacements:
       linux: Linux
       amd64: x86_64
-snapshot:
-  name_template: "{{ .Tag }}-{{.ShortCommit}}"
+
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
+
 changelog:
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
+
 dockers:
   - use: buildx
     goos: linux
@@ -55,6 +58,9 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--cache-from=type=local,src=/tmp/.buildx-cache"
+      - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
+
   - use: buildx
     goos: linux
     goarch: arm64
@@ -67,6 +73,9 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--cache-from=type=local,src=/tmp/.buildx-cache"
+      - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
+
   - use: buildx
     goos: linux
     goarch: arm
@@ -80,6 +89,9 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--cache-from=type=local,src=/tmp/.buildx-cache"
+      - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
+
   - use: buildx
     goos: linux
     goarch: arm
@@ -93,6 +105,9 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--cache-from=type=local,src=/tmp/.buildx-cache"
+      - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
+
 docker_manifests:
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}
     image_templates:
@@ -100,6 +115,7 @@ docker_manifests:
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-arm64v8
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-armv6
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-armv7
+      
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest
     image_templates:
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-amd64
