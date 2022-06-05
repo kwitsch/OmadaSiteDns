@@ -65,6 +65,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           version: latest
-          args: release --rm-dist ${{ !startsWith(github.ref, 'refs/tags/') && '--nightly' || '' }}
+          args: release --rm-dist ${{ !startsWith(github.ref, 'refs/tags/') && '--skip-announce --skip-publish --skip-sbom --skip-sign' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+          IS_EDGE: ${{ !startsWith(github.ref, 'refs/tags/') }}
