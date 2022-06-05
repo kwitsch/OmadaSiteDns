@@ -7,6 +7,7 @@ before:
     - sh -c "cd ./src && go get -u github.com/breml/rootcerts"
     - sh -c "cd ./src && go mod download"
     - sh -c "cd ./src && go mod verify"
+    - sh -c "cd ./src && go mod tidy"
 builds:
   - dir: src
     binary: omadasitedns
@@ -27,6 +28,22 @@ builds:
       - 6
       - 7
     mod_timestamp: "{{ .CommitTimestamp }}"
+release:
+  draft: true
+archives:
+  - replacements:
+      linux: Linux
+      amd64: x86_64
+snapshot:
+  name_template: "{{ .Tag }}-{{.ShortCommit}}"
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
 dockers:
   - use: buildx
     goos: linux
