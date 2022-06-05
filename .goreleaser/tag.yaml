@@ -1,7 +1,4 @@
 project_name: omadasitedns
-env:
-  - IS_EDGE=true
-  - VERSION={{ if .Env.IS_EDGE }}{{ .Version }}{{ else }}edge{{ end }}
 
 before:
   hooks:
@@ -53,87 +50,67 @@ dockers:
     goos: linux
     goarch: amd64
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-amd64"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-amd64"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:latest-amd64"
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Env.VERSION}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 
   - use: buildx
     goos: linux
     goarch: arm64
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-arm64v8"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-arm64v8"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:latest-arm64v8"
     build_flag_templates:
       - "--platform=linux/arm64/v8"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Env.VERSION}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 
   - use: buildx
     goos: linux
     goarch: arm
     goarm: 6
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv6"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-armv6"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv6"
     build_flag_templates:
       - "--platform=linux/arm/v6"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Env.VERSION}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 
   - use: buildx
     goos: linux
     goarch: arm
     goarm: 7
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv7"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-armv7"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv7"
     build_flag_templates:
       - "--platform=linux/arm/v7"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Env.VERSION}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 
 docker_manifests:
-  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}
+  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}
     image_templates:
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-amd64
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-arm64v8
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv6
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv7
-
-  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-amd64
-    image_templates:
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-amd64
-    skip_push: "{{ .Env.IS_EDGE }}"
-    
-  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-arm64v8
-    image_templates:
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-arm64v8
-    skip_push: "{{ .Env.IS_EDGE }}"
-  
-  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv6
-    image_templates:
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv6
-    skip_push: "{{ .Env.IS_EDGE }}"
-  
-  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv7
-    image_templates:
-      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv7
-    skip_push: "{{ .Env.IS_EDGE }}"
-  
+      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-amd64
+      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-arm64v8
+      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-armv6
+      - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Version }}-armv7
+      
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest
     image_templates:
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-amd64
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-arm64v8
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv6
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv7
-    skip_push: "{{ .Env.IS_EDGE }}"
-
-release: 
-  disable: true

@@ -1,0 +1,93 @@
+project_name: omadasitedns
+
+before:
+  hooks:
+    - sudo apt update
+    - sudo apt install -y build-essential
+    - go get github.com/ramr/go-reaper
+    - go get -u github.com/breml/rootcerts
+    - go mod download
+    - go mod verify
+    - go mod tidy
+
+builds:
+  - binary: omadasitedns
+    env:
+      - CGO_ENABLED=0
+      - GO_ROOTCERTS_ENABLE=1
+    ldflags:
+      - -w
+      - -s
+      - -extldflags "-static"
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - 6
+      - 7
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+dockers:
+  - use: buildx
+    goos: linux
+    goarch: amd64
+    image_templates:
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-amd64"
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version=edge"
+
+  - use: buildx
+    goos: linux
+    goarch: arm64
+    image_templates:
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-arm64v8"
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version=edge"
+
+  - use: buildx
+    goos: linux
+    goarch: arm
+    goarm: 6
+    image_templates:
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv6"
+    build_flag_templates:
+      - "--platform=linux/arm/v6"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version=edge"
+
+  - use: buildx
+    goos: linux
+    goarch: arm
+    goarm: 7
+    image_templates:
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv7"
+    build_flag_templates:
+      - "--platform=linux/arm/v7"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version=edge"
+
+docker_manifests:
+  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:edge
+    image_templates:
+      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-amd64
+      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-arm64v8
+      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv6
+      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv7
+
+release: 
+  disable: true

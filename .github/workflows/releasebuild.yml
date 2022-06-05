@@ -65,7 +65,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           version: latest
-          args: release --rm-dist ${{ !startsWith(github.ref, 'refs/tags/') && '--skip-announce --skip-publish --skip-sbom --skip-sign' || '' }}
+          args: release --rm-dist ${{ !startsWith(github.ref, 'refs/tags/') && '--skip-announce --skip-sbom --skip-sign -f .goreleaser/edge.yaml' || '-f .goreleaser/tag.yaml' }}
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
           IS_EDGE: ${{ !startsWith(github.ref, 'refs/tags/') }}
