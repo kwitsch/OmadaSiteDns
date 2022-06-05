@@ -81,13 +81,5 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version=edge"
 
-docker_manifests:
-  - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:edge
-    image_templates:
-      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-amd64
-      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-arm64v8
-      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv6
-      - ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv7
-
 release: 
   disable: true
