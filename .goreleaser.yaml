@@ -31,7 +31,7 @@ archives:
   - replacements:
       linux: Linux
       amd64: x86_64
-snapshot:
+nightly:
   name_template: "edge"
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
@@ -105,3 +105,4 @@ docker_manifests:
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-arm64v8
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv6
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv7
+    skip_push: {{ .IsNightly }}
