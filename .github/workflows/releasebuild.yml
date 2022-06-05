@@ -1,9 +1,11 @@
-name: releasebuild
+name: Docker Build
 
 on:
   push:
-   tags:
-    - v*
+    branches: 
+      - development
+    tags:
+      - v*
 
 jobs:
   goreleaser:
@@ -64,6 +66,6 @@ jobs:
         if: success() && startsWith(github.ref, 'refs/tags/')
         with:
           version: latest
-          args: release --rm-dist
+          args: release --rm-dist ${{ !startsWith(github.ref, 'refs/tags/') && '--snapshot' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
