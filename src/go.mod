@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/breml/rootcerts v0.2.3
 	github.com/creasty/defaults v1.5.2 // indirect
 	github.com/knadh/koanf v1.3.3 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
