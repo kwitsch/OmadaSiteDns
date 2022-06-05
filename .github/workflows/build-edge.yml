@@ -71,19 +71,19 @@ jobs:
       - name: Push edge images ⬆
         if: ${{ success() }}
         run: |
-          docker push ghcr.io/{{ github.repository }}:edge-amd64
-          docker push ghcr.io/{{ github.repository }}:edge-arm64v8
-          docker push ghcr.io/{{ github.repository }}:edge-armv6
-          docker push ghcr.io/{{ github.repository }}:edge-armv7
+          docker push ghcr.io/${{ github.repository }}:edge-amd64
+          docker push ghcr.io/${{ github.repository }}:edge-arm64v8
+          docker push ghcr.io/${{ github.repository }}:edge-armv6
+          docker push ghcr.io/${{ github.repository }}:edge-armv7
 
           docker manifest create \
-          ghcr.io/{{ github.repository }}:edge \
-          --amend ghcr.io/{{ github.repository }}:edge-amd64 \
-          --amend ghcr.io/{{ github.repository }}:edge-arm64v8 \
-          --amend ghcr.io/{{ github.repository }}:edge-armv6 \
-          --amend ghcr.io/{{ github.repository }}:edge-armv7
+          ghcr.io/${{ github.repository }}:edge \
+          --amend ghcr.io/${{ github.repository }}:edge-amd64 \
+          --amend ghcr.io/${{ github.repository }}:edge-arm64v8 \
+          --amend ghcr.io/${{ github.repository }}:edge-armv6 \
+          --amend ghcr.io/${{ github.repository }}:edge-armv7
 
-          docker manifest push ghcr.io/{{ github.repository }}:edge
+          docker manifest push ghcr.io/${{ github.repository }}:edge
 
       - name: Clean Docker cache 🧹
         run: |
