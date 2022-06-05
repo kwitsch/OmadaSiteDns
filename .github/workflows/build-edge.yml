@@ -68,22 +68,29 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
 
+      - name: Sanetize repo string ⚙
+        id: string
+        if: ${{ success() }}
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: ${{ github.repository }}
+
       - name: Push edge images ⬆
         if: ${{ success() }}
         run: |
-          docker push ghcr.io/${{ github.repository }}:edge-amd64
-          docker push ghcr.io/${{ github.repository }}:edge-arm64v8
-          docker push ghcr.io/${{ github.repository }}:edge-armv6
-          docker push ghcr.io/${{ github.repository }}:edge-armv7
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-amd64
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-arm64v8
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv6
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv7
 
           docker manifest create \
-          ghcr.io/${{ github.repository }}:edge \
-          --amend ghcr.io/${{ github.repository }}:edge-amd64 \
-          --amend ghcr.io/${{ github.repository }}:edge-arm64v8 \
-          --amend ghcr.io/${{ github.repository }}:edge-armv6 \
-          --amend ghcr.io/${{ github.repository }}:edge-armv7
+          ghcr.io/${{ steps.string.outputs.lowercase }}:edge \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-amd64 \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-arm64v8 \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv6 \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv7
 
-          docker manifest push ghcr.io/${{ github.repository }}:edge
+          docker manifest push ghcr.io/${{ steps.string.outputs.lowercase }}:edge
 
       - name: Clean Docker cache 🧹
         run: |
