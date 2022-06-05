@@ -28,10 +28,20 @@ jobs:
           restore-keys: |
             omadasitedns-docker-cache-
 
-      - name: Setup Go ⚙
-        uses: magnetikonline/action-golang-cache@v2
+      - name: Setup Golang ⚙
+        uses: actions/setup-go@v3
         with:
           go-version: ~1.17
+
+      - name: Setup Golang caches ⚙
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('**/src/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
       
       - name: Setup QEMU ⚙
         uses: docker/setup-qemu-action@v1
