@@ -1,5 +1,6 @@
 project_name: omadasitedns
 env:
+  - IS_EDGE=true
   - VERSION={{ if .Env.IS_EDGE }}{{ .Version }}{{ else }}edge{{ end }}
 
 before:
@@ -109,22 +110,22 @@ docker_manifests:
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-amd64
     image_templates:
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-amd64
-    skip_push: {{ .Env.IS_EDGE }}
+    skip_push: "{{ .Env.IS_EDGE }}"
     
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-arm64v8
     image_templates:
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-arm64v8
-    skip_push: {{ .Env.IS_EDGE }}
+    skip_push: "{{ .Env.IS_EDGE }}"
   
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv6
     image_templates:
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv6
-    skip_push: {{ .Env.IS_EDGE }}
+    skip_push: "{{ .Env.IS_EDGE }}"
   
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv7
     image_templates:
       - ghcr.io/kwitsch/{{ .ProjectName }}:{{ .Env.VERSION }}-armv7
-    skip_push: {{ .Env.IS_EDGE }}
+    skip_push: "{{ .Env.IS_EDGE }}"
   
   - name_template: ghcr.io/kwitsch/{{ .ProjectName }}:latest
     image_templates:
@@ -132,7 +133,7 @@ docker_manifests:
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-arm64v8
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv6
       - ghcr.io/kwitsch/{{ .ProjectName }}:latest-armv7
-    skip_push: {{ .Env.IS_EDGE }}
+    skip_push: "{{ .Env.IS_EDGE }}"
 
 release: 
-  disable: {{ .Env.IS_EDGE }}
+  disable: true
