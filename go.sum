@@ -67,6 +67,8 @@ github.com/kwitsch/go-dockerutils v0.0.9 h1:Nred9wGYPvBT0/x0NDpDgvnu2H9Nhie9yaXD
 github.com/kwitsch/go-dockerutils v0.0.9/go.mod h1:yYzMHpMV2F2GC5x7A7NnEdl6wk6cex5QN3VrNnWYBXA=
 github.com/kwitsch/omadaclient v0.0.6 h1:9I1BUouWltmqdHL/rVnZTjV/YZuVK2DPuZ02+6veXAY=
 github.com/kwitsch/omadaclient v0.0.6/go.mod h1:G18nLPEw4LGieWksJpohQA9AV/PEboZj4vH+6aCtN2U=
+github.com/kwitsch/omadaclient v0.0.7 h1:Oiv7H1bCMcj7fs8CpVpdlg3fbDrkHfD0AYm1UY5Ve38=
+github.com/kwitsch/omadaclient v0.0.7/go.mod h1:G18nLPEw4LGieWksJpohQA9AV/PEboZj4vH+6aCtN2U=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.3/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/miekg/dns v1.1.49 h1:qe0mQU3Z/XpFeE+AEBo2rqaS1IPBJ3anmqZ4XiZJVG8=
