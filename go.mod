@@ -5,7 +5,7 @@ go 1.17
 require github.com/kwitsch/go-dockerutils v0.0.9
 
 require (
-	github.com/kwitsch/omadaclient v0.0.7
+	github.com/kwitsch/omadaclient v0.0.8
 	github.com/miekg/dns v1.1.49
 )
 
