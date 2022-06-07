@@ -1,4 +1,4 @@
-name: Build Edge
+name: Build development
 
 on:
   push:
@@ -64,7 +64,7 @@ jobs:
         if: ${{ success() }}
         with:
           version: latest
-          args: release --rm-dist -f .goreleaser/edge.yaml
+          args: release --rm-dist -f .goreleaser/dev.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
 
@@ -75,22 +75,22 @@ jobs:
         with:
           string: ${{ github.repository }}
 
-      - name: Push edge images ⬆
+      - name: Push dev images ⬆
         if: ${{ success() }}
         run: |
-          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-amd64
-          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-arm64v8
-          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv6
-          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv7
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:dev-amd64
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:dev-arm64v8
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:dev-armv6
+          docker push ghcr.io/${{ steps.string.outputs.lowercase }}:dev-armv7
 
           docker manifest create \
-          ghcr.io/${{ steps.string.outputs.lowercase }}:edge \
-          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-amd64 \
-          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-arm64v8 \
-          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv6 \
-          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:edge-armv7
+          ghcr.io/${{ steps.string.outputs.lowercase }}:dev \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:dev-amd64 \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:dev-arm64v8 \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:dev-armv6 \
+          --amend ghcr.io/${{ steps.string.outputs.lowercase }}:dev-armv7
 
-          docker manifest push ghcr.io/${{ steps.string.outputs.lowercase }}:edge
+          docker manifest push ghcr.io/${{ steps.string.outputs.lowercase }}:dev
 
       - name: Clean Docker cache 🧹
         run: |

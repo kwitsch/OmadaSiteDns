@@ -35,13 +35,13 @@ dockers:
     goos: linux
     goarch: amd64
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-amd64"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:dev-amd64"
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version=edge"
+      - "--label=org.opencontainers.image.version=dev"
       - "--cache-from=type=local,src=/tmp/.buildx-cache"
       - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
 
@@ -49,13 +49,13 @@ dockers:
     goos: linux
     goarch: arm64
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-arm64v8"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:dev-arm64v8"
     build_flag_templates:
       - "--platform=linux/arm64/v8"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version=edge"
+      - "--label=org.opencontainers.image.version=dev"
       - "--cache-from=type=local,src=/tmp/.buildx-cache"
       - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
 
@@ -64,13 +64,13 @@ dockers:
     goarch: arm
     goarm: 6
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv6"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:dev-armv6"
     build_flag_templates:
       - "--platform=linux/arm/v6"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version=edge"
+      - "--label=org.opencontainers.image.version=dev"
       - "--cache-from=type=local,src=/tmp/.buildx-cache"
       - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
 
@@ -79,13 +79,13 @@ dockers:
     goarch: arm
     goarm: 7
     image_templates:
-      - "ghcr.io/kwitsch/{{ .ProjectName }}:edge-armv7"
+      - "ghcr.io/kwitsch/{{ .ProjectName }}:dev-armv7"
     build_flag_templates:
       - "--platform=linux/arm/v7"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version=edge"
+      - "--label=org.opencontainers.image.version=dev"
       - "--cache-from=type=local,src=/tmp/.buildx-cache"
       - "--cache-to=type=local,dest=/tmp/.buildx-cache-new"
 
