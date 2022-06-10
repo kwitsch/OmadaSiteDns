@@ -94,9 +94,10 @@ func (le *LogEntry) StringMap(cache *cache.Cache) map[string]interface{} {
 		rreason = "Resolved"
 		rtype = "RESOLVED"
 	}
+	cName := le.QName(cache)
 	res := map[string]interface{}{
 		"ClientIP":      le.ClientIp,
-		"ClientName":    le.QName(cache),
+		"ClientName":    cName,
 		"DurationMs":    le.Duration,
 		"Reason":        rreason,
 		"ResponseType":  rtype,
@@ -113,9 +114,9 @@ func (le *LogEntry) StringMap(cache *cache.Cache) map[string]interface{} {
 
 func (le *LogEntry) QName(cache *cache.Cache) string {
 	revip, reverr := util.ReverseIP(le.ClientIp)
+	fmt.Println(le.ClientIp, "->", revip, "("+reverr.Error()+")")
 	res := le.ClientIp
 	if reverr == nil {
-		fmt.Println(le.ClientIp, "->", revip)
 		tmp, ghSuc := cache.GetHostname(revip)
 		if ghSuc && len(tmp) > 0 {
 			fmt.Println(le.ClientIp, "->", tmp)
