@@ -114,14 +114,16 @@ func (le *LogEntry) StringMap(cache *cache.Cache) map[string]interface{} {
 
 func (le *LogEntry) QName(cache *cache.Cache) string {
 	revip, reverr := util.ReverseIP(le.ClientIp)
-	fmt.Println(le.ClientIp, "->", revip, "("+reverr.Error()+")")
+	fmt.Println(le.ClientIp, "->", revip)
 	res := le.ClientIp
-	if reverr == nil {
+	if reverr == nil && len(revip) > 0 {
 		tmp, ghSuc := cache.GetHostname(revip)
 		if ghSuc && len(tmp) > 0 {
 			fmt.Println(le.ClientIp, "->", tmp)
 			res = tmp
 		}
+	} else {
+		fmt.Println("Revip Error:", reverr.Error())
 	}
 	return res
 }
