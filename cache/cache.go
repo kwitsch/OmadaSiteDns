@@ -2,10 +2,9 @@ package cache
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 
-	"github.com/kwitsch/omadaclient/utils"
+	"github.com/kwitsch/OmadaSiteDns/util"
 )
 
 type Cache struct {
@@ -58,17 +57,9 @@ func (c *Cache) Print() {
 }
 
 func (c *Cache) addRDns(hostname, ip string) {
-	if revIp, revErr := reverseIP(ip); revErr == nil {
+	if revIp, revErr := util.ReverseIP(ip); revErr == nil {
 		c.lock.Lock()
 		defer c.lock.Unlock()
 		c.rdns[revIp] = hostname
 	}
-}
-
-func reverseIP(ip string) (string, error) {
-	parts := strings.Split(ip, ".")
-	if len(parts) == 4 {
-		return fmt.Sprintf("%s.%s.%s.%s", parts[3], parts[2], parts[1], parts[0]), nil
-	}
-	return "", utils.NewError("invalid ip")
 }

@@ -10,8 +10,16 @@ require (
 )
 
 require (
+	github.com/deepmap/oapi-codegen v1.8.2 // indirect
+	github.com/influxdata/line-protocol v0.0.0-20200327222509-2487e7298839 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
+)
+
+require (
 	github.com/breml/rootcerts v0.2.3
 	github.com/creasty/defaults v1.5.2 // indirect
+	github.com/influxdata/influxdb-client-go/v2 v2.9.0
 	github.com/knadh/koanf v1.3.3 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect

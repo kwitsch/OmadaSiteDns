@@ -14,6 +14,7 @@ type Config struct {
 	Site    Site    `koanf:"site"`
 	Crawler Crawler `koanf:"crawler"`
 	Server  Server  `koanf:"server"`
+	Logger  Logger  `koanf:"logger"`
 }
 
 type Site struct {
@@ -43,6 +44,14 @@ type Server struct {
 	Tcp bool          `koanf:"tcp" default:"true"`
 }
 
+type Logger struct {
+	Url     string `koan:"url"`
+	Token   string `koan:"token"`
+	Org     string `koan:"org"`
+	Bucket  string `koan:"bucket"`
+	Enabled bool   `default:"false"`
+}
+
 const prefix = "OSD_"
 
 func Get() (*Config, error) {
@@ -70,6 +79,18 @@ func Get() (*Config, error) {
 	for k, v := range res.Crawler.Converters {
 		if !osdutils.ValidSubstitute(v.Substitute) {
 			return nil, utils.NewError("Converter", "-", k, "has invalid substitute:", v.Substitute)
+		}
+	}
+
+	if !strIsNotSet(res.Logger.Url) {
+		if strIsNotSet(res.Logger.Token) {
+			return nil, utils.NewError("No token set for logger")
+		} else if strIsNotSet(res.Logger.Org) {
+			return nil, utils.NewError("No organization set for logger")
+		} else if strIsNotSet(res.Logger.Bucket) {
+			return nil, utils.NewError("No bucket set for logger")
+		} else {
+			res.Logger.Enabled = true
 		}
 	}
 

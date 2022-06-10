@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/kwitsch/OmadaSiteDns/cache"
 	"github.com/kwitsch/OmadaSiteDns/config"
+	"github.com/kwitsch/OmadaSiteDns/querylogger"
 	"github.com/kwitsch/omadaclient/log"
 	"github.com/miekg/dns"
 )
@@ -17,16 +19,18 @@ type Server struct {
 	cache *cache.Cache
 	cfg   *config.Server
 	l     *log.Log
+	ql    *querylogger.QueryLogger
 	Error chan (error)
 }
 
-func New(cache *cache.Cache, cfg config.Server, verbose bool) *Server {
+func New(cache *cache.Cache, cfgs config.Server, cfgl config.Logger, verbose bool) *Server {
 	res := &Server{
 		udp:   createUDPServer(),
 		tcp:   createTCPServer(),
 		cache: cache,
-		cfg:   &cfg,
+		cfg:   &cfgs,
 		l:     log.New("Server", verbose),
+		ql:    querylogger.New(cfgl, cache, verbose),
 		Error: make(chan error, 2),
 	}
 
@@ -36,6 +40,8 @@ func New(cache *cache.Cache, cfg config.Server, verbose bool) *Server {
 }
 
 func (s *Server) Start() {
+	s.ql.Start()
+
 	if s.cfg.Udp {
 		go func() {
 			s.Error <- s.udp.ListenAndServe()
@@ -95,6 +101,12 @@ func createTCPServer() *dns.Server {
 const rdnsSuf string = ".in-addr.arpa"
 
 func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
+	start := time.Now()
+
+	clientip := "0.0.0.0"
+	if w != nil {
+		clientip = resolveClientIP(w.RemoteAddr())
+	}
 	q := request.Question[0]
 	s.l.V("Requst:", q.Name, "Type:", q.Qtype)
 	m := new(dns.Msg)
@@ -148,5 +160,26 @@ func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 			m.SetRcode(request, dns.RcodeNameError)
 		}
 	}
+
+	duration := time.Since(start).Milliseconds()
+
 	w.WriteMsg(m)
+
+	s.ql.Log(querylogger.LogEntry{
+		ClientIp: clientip,
+		Request:  request,
+		Response: m,
+		Start:    start,
+		Duration: duration,
+	})
+}
+
+func resolveClientIP(addr net.Addr) string {
+	if t, ok := addr.(*net.UDPAddr); ok {
+		return t.IP.String()
+	} else if t, ok := addr.(*net.TCPAddr); ok {
+		return t.IP.String()
+	}
+
+	return "0.0.0.0"
 }
