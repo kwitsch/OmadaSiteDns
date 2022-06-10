@@ -30,6 +30,8 @@ type QueryLogger struct {
 	schan  chan bool
 }
 
+const application = "omadaclient"
+
 func New(cfg config.Logger, cache *cache.Cache, verbose bool) *QueryLogger {
 	res := QueryLogger{
 		cfg:   &cfg,
@@ -85,15 +87,24 @@ func (ql *QueryLogger) Log(le LogEntry) {
 }
 
 func (le *LogEntry) String(cache *cache.Cache) map[string]interface{} {
+	rreason := "Unknown"
+	rtype := "UNKNOWN"
+	if le.Response.Rcode != dns.RcodeNameError {
+		rreason = "Resolved"
+		rtype = "RESOLVED"
+	}
 	res := map[string]interface{}{
 		"ClientIP":      le.ClientIp,
 		"ClientName":    le.QName(cache),
 		"DurationMs":    le.Duration,
+		"Reason":        rreason,
+		"ResponseType":  rtype,
 		"QuestionType":  dns.TypeToString[le.Request.Question[0].Qtype],
 		"QuestionName":  util.QName(le.Request),
 		"EffectiveTLDP": util.TLDPlusOne(le.Request),
 		"Answer":        util.AnswerToString(le.Response.Answer),
 		"ResponseCode":  dns.RcodeToString[le.Response.Rcode],
+		"Application":   application,
 	}
 
 	return res
