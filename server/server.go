@@ -112,9 +112,9 @@ func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(request)
 
+	exists := false
 	if q.Qtype == dns.TypePTR || q.Qtype == dns.TypeA {
 		cname := strings.TrimSuffix(strings.ToLower(q.Name), ".")
-		exists := false
 		val := ""
 
 		if q.Qtype == dns.TypePTR {
@@ -154,11 +154,11 @@ func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 				s.l.Return(val)
 			}
 		}
+	}
 
-		if !exists {
-			s.l.Return("NXDomain")
-			m.SetRcode(request, dns.RcodeNameError)
-		}
+	if !exists {
+		s.l.Return("NXDomain")
+		m.SetRcode(request, dns.RcodeNameError)
 	}
 
 	duration := time.Since(start).Milliseconds()
