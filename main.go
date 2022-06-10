@@ -43,7 +43,7 @@ func main() {
 	crawler := crawler.New(api, cache, &cfg.Crawler, (cfg.Verbose > 0))
 	defer crawler.Close()
 
-	server := server.New(cache, cfg.Server, (cfg.Verbose > 0))
+	server := server.New(cache, cfg.Server, cfg.Logger, (cfg.Verbose > 0))
 	defer server.Stop()
 	server.Start()
 
