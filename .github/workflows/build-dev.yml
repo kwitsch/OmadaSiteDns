@@ -26,16 +26,6 @@ jobs:
         with:
           go-version: ~1.17
 
-      - name: Setup Golang caches ⚙
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-golang-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-golang-
-      
       - name: Setup QEMU ⚙
         uses: docker/setup-qemu-action@v1
         with:
@@ -45,14 +35,6 @@ jobs:
       - name: Setup Docker Buildx ⚙
         uses: docker/setup-buildx-action@v1
       
-      - name: Setup Docker layer cache ⚙
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
       - name: Login to Registry 🔒
         uses: docker/login-action@v1 
         with:
@@ -92,8 +74,3 @@ jobs:
           --amend ghcr.io/${{ steps.string.outputs.lowercase }}:dev-armv7
 
           docker manifest push ghcr.io/${{ steps.string.outputs.lowercase }}:dev
-
-      - name: Clean Docker cache 🧹
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
