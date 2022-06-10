@@ -1,6 +1,7 @@
 package querylogger
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -114,8 +115,10 @@ func (le *LogEntry) QName(cache *cache.Cache) string {
 	revip, reverr := util.ReverseIP(le.ClientIp)
 	res := le.ClientIp
 	if reverr == nil {
+		fmt.Println(le.ClientIp, "->", revip)
 		tmp, ghSuc := cache.GetHostname(revip)
-		if ghSuc {
+		if ghSuc && len(tmp) > 0 {
+			fmt.Println(le.ClientIp, "->", tmp)
 			res = tmp
 		}
 	}
