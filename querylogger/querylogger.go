@@ -57,7 +57,7 @@ func (ql *QueryLogger) Start() {
 			for {
 				select {
 				case m := <-ql.ichan:
-					p := influxdb2.NewPoint(hname, map[string]string{}, m.String(ql.cache), m.Start)
+					p := influxdb2.NewPoint(hname, map[string]string{}, m.StringMap(ql.cache), m.Start)
 					writeAPI.WritePoint(p)
 				case e := <-writeAPI.Errors():
 					ql.l.E(e)
@@ -86,7 +86,7 @@ func (ql *QueryLogger) Log(le LogEntry) {
 	}
 }
 
-func (le *LogEntry) String(cache *cache.Cache) map[string]interface{} {
+func (le *LogEntry) StringMap(cache *cache.Cache) map[string]interface{} {
 	rreason := "Unknown"
 	rtype := "UNKNOWN"
 	if le.Response.Rcode != dns.RcodeNameError {
@@ -114,7 +114,10 @@ func (le *LogEntry) QName(cache *cache.Cache) string {
 	revip, reverr := util.ReverseIP(le.ClientIp)
 	res := le.ClientIp
 	if reverr == nil {
-		res, _ = cache.GetHostname(revip)
+		tmp, ghSuc := cache.GetHostname(revip)
+		if ghSuc {
+			res = tmp
+		}
 	}
 	return res
 }
