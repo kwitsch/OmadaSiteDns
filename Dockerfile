@@ -46,9 +46,7 @@ RUN --mount=type=bind,target=. \
     --mount=type=cache,target=/root/.cache/go-build \ 
     --mount=type=cache,target=/go/pkg \
     go build \
-    -tags static \
     -v \
-    -ldflags="-linkmode external -extldflags -static" \
     -o /bin/omadasitedns
 
 RUN chmod 1001 /bin/omadasitedns
