@@ -78,9 +78,7 @@ func (c *Crawler) fetchNetworks() {
 
 	for _, n := range *networks {
 		err := c.domains.AddNetwork(n.Name, n.GatewaySubnet, n.Domain)
-		if c.failed(err) {
-			return
-		}
+		c.l.V(n.Name, err)
 	}
 }
 

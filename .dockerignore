@@ -1,0 +1,6 @@
+.gitignore
+.dockerignore
+.github/
+.goreleaser/
+*.md
+LICENSE
