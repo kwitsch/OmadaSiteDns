@@ -49,7 +49,9 @@ RUN --mount=type=bind,target=. \
     -v \
     -o /bin/omadasitedns
 
-RUN chown 1001 /bin/omadasitedns
+RUN apk add --no-cache libcap && \
+    setcap 'cap_net_bind_service=+ep' /bin/omadasitedns && \
+    chown 1001 /bin/omadasitedns
 
 FROM scratch
 
