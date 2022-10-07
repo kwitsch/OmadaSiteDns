@@ -26,29 +26,29 @@ type Site struct {
 }
 
 type Crawler struct {
-	HostIntervall    time.Duration `koan:"hostintervall" default:"5m"`
-	NetworkIntervall time.Duration `koan:"networkintervall" default:"60m"`
+	HostIntervall    time.Duration `koanf:"hostintervall" default:"5m"`
+	NetworkIntervall time.Duration `koanf:"networkintervall" default:"60m"`
 	Converters       map[int]struct {
-		Regex      string `koan:"regex"`
-		Substitute string `koan:"substitute"`
-	} `koan:"converters"`
+		Regex      string `koanf:"regex"`
+		Substitute string `koanf:"substitute"`
+	} `koanf:"converters"`
 	Network map[int]struct {
-		Name   string `koan:"name"`
-		Domain string `koan:"domain"`
-	} `koan:"network"`
+		Name   string `koanf:"name"`
+		Domain string `koanf:"domain"`
+	} `koanf:"network"`
 }
 
 type Server struct {
-	Ttl time.Duration `koan:"ttl" default:"5m"`
+	Ttl time.Duration `koanf:"ttl" default:"5m"`
 	Udp bool          `koanf:"udp" default:"true"`
 	Tcp bool          `koanf:"tcp" default:"true"`
 }
 
 type Logger struct {
-	Url     string `koan:"url"`
-	Token   string `koan:"token"`
-	Org     string `koan:"org"`
-	Bucket  string `koan:"bucket"`
+	Url     string `koanf:"url"`
+	Token   string `koanf:"token"`
+	Org     string `koanf:"org"`
+	Bucket  string `koanf:"bucket"`
 	Enabled bool   `default:"false"`
 }
 
