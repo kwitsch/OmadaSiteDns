@@ -49,7 +49,7 @@ RUN --mount=type=bind,target=. \
     -v \
     -o /bin/omadasitedns
 
-RUN chmod 1001 /bin/omadasitedns
+RUN chown 1001 /bin/omadasitedns
 
 FROM scratch
 
