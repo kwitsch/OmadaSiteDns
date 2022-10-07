@@ -51,7 +51,8 @@ RUN --mount=type=bind,target=. \
 
 RUN apk add --no-cache libcap && \
     setcap 'cap_net_bind_service=+ep' /bin/omadasitedns && \
-    chown 1001 /bin/omadasitedns
+    chown 1001 /bin/omadasitedns && \
+    chmod u+x /bin/omadasitedns
 
 FROM scratch
 
