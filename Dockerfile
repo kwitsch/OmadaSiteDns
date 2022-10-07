@@ -1,26 +1,63 @@
-FROM golang:alpine AS builder
+# get newest certificates
+FROM --platform=$BUILDPLATFORM alpine:3.16 AS ca-certs
+RUN apk add --no-cache ca-certificates
+RUN --mount=type=cache,target=/etc/ssl/certs \
+    update-ca-certificates 2>/dev/null || true
 
-RUN adduser \    
-    --disabled-password \    
-    --gecos "" \    
-    --home "/nonexistent" \    
-    --shell "/sbin/nologin" \    
-    --no-create-home \    
-    --uid "10001" \    
-    "appuser"
+# zig compiler
+FROM --platform=$BUILDPLATFORM ghcr.io/euantorano/zig:master AS zig-env
 
-COPY /omadasitedns /omadasitedns
+# build environment
+FROM --platform=$BUILDPLATFORM golang:1-alpine AS build
 
-RUN chown appuser /omadasitedns && \
-    chown :appuser /omadasitedns
+# required arguments(buildx will set target)
+ARG VERSION
+ARG BUILD_TIME
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+
+# set working directory
+WORKDIR /go/src
+
+# download packages
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg \
+    go mod download
+
+# add source
+COPY . .
+
+# setup go+zig
+COPY --from=zig-env /usr/local/bin/zig /usr/local/bin/zig
+ENV PATH="/usr/local/bin/zig:${PATH}"
+RUN --mount=type=cache,target=/go/pkg \
+    go install github.com/dosgo/zigtool/zigcc@latest && \
+    go install github.com/dosgo/zigtool/zigcpp@latest && \
+    go env -w GOARM=${TARGETVARIANT##*v}
+ENV CC="zigcc" \
+    CXX="zigcpp" \
+    CGO_ENABLED=0 \
+    GOOS="linux" \
+    GOARCH=$TARGETARCH
+
+# build binary 
+RUN --mount=type=bind,target=. \
+    --mount=type=cache,target=/root/.cache/go-build \ 
+    --mount=type=cache,target=/go/pkg \
+    go build \
+    -tags static \
+    -v \
+    -ldflags="-linkmode external -extldflags -static" \
+    -o /bin/omadasitedns
+
+RUN chmod 1001 /bin/omadasitedns
 
 FROM scratch
-COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /etc/group /etc/group
 
-COPY --from=builder /omadasitedns /omadasitedns
+COPY --from=build /bin/omadasitedns /omadasitedns
 
-USER appuser:appuser
+USER 1001
 
 EXPOSE 53
 
