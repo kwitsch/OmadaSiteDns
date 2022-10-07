@@ -53,6 +53,7 @@ RUN chmod 1001 /bin/omadasitedns
 
 FROM scratch
 
+COPY --from=ca-certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /bin/omadasitedns /omadasitedns
 
 USER 1001

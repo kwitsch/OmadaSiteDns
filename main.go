@@ -14,7 +14,6 @@ import (
 
 	_ "time/tzdata"
 
-	_ "github.com/breml/rootcerts"
 	_ "github.com/kwitsch/go-dockerutils"
 )
 
