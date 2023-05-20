@@ -25,7 +25,6 @@ The server for those protocolls are enabled with the OSD_SERVER_UDP and OSD_SERV
 
 The service won't start if both servers are disabled.
 
-
 | Port | Protocoll | Purpose    |
 | ------ | ----------- | ------------ |
 | 53   | UDP & TCP | DNS server |
@@ -33,7 +32,6 @@ The service won't start if both servers are disabled.
 ## Environment variables
 
 All variables can be set eighter through the environment or with docker-secrets.
-
 
 | Environment                               | Type   | Description                                                                                             | Default | Required |
 | ------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------- | --------- | :--------- |

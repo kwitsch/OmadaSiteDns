@@ -107,5 +107,5 @@ func Get() (*Config, error) {
 }
 
 func strIsNotSet(input string) bool {
-	return (len(input) == 0)
+	return len(input) == 0
 }
