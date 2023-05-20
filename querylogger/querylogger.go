@@ -33,11 +33,11 @@ type QueryLogger struct {
 
 const application = "omadaclient"
 
-func New(cfg config.Logger, cache *cache.Cache, verbose bool) *QueryLogger {
+func New(cfg config.Logger, cacheIn *cache.Cache, verbose bool) *QueryLogger {
 	res := QueryLogger{
 		cfg:   &cfg,
 		l:     log.New("QueryLogger", verbose),
-		cache: cache,
+		cache: cacheIn,
 	}
 
 	if res.cfg.Enabled {
@@ -87,14 +87,14 @@ func (ql *QueryLogger) Log(le LogEntry) {
 	}
 }
 
-func (le *LogEntry) StringMap(cache *cache.Cache) map[string]interface{} {
+func (le *LogEntry) StringMap(cacheIn *cache.Cache) map[string]interface{} {
 	rreason := "Unknown"
 	rtype := "UNKNOWN"
 	if le.Response.Rcode != dns.RcodeNameError {
 		rreason = "Resolved"
 		rtype = "RESOLVED"
 	}
-	cName := le.QName(cache)
+	cName := le.QName(cacheIn)
 	res := map[string]interface{}{
 		"ClientIP":      le.ClientIp,
 		"ClientName":    cName,
@@ -112,12 +112,12 @@ func (le *LogEntry) StringMap(cache *cache.Cache) map[string]interface{} {
 	return res
 }
 
-func (le *LogEntry) QName(cache *cache.Cache) string {
+func (le *LogEntry) QName(cacheIn *cache.Cache) string {
 	revip, reverr := util.ReverseIP(le.ClientIp)
 	fmt.Println("LogEntry.QName reverse:", le.ClientIp, "->", revip)
 	res := le.ClientIp
 	if reverr == nil && len(revip) > 0 {
-		tmp, ghSuc := cache.GetHostname(revip)
+		tmp, ghSuc := cacheIn.GetHostname(revip)
 		if ghSuc && len(tmp) > 0 {
 			fmt.Println("LogEntry.QName set:", le.ClientIp, "->", tmp)
 			res = tmp
