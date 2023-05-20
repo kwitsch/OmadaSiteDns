@@ -25,7 +25,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/ramr/go-reaper v0.2.1 // indirect
-	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.7.0
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
