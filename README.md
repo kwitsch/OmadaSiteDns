@@ -36,7 +36,7 @@ All variables can be set eighter through the environment or with docker-secrets.
 | Environment                               | Type   | Description                                                                                             | Default | Required |
 | ------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------- | --------- | :--------- |
 | OSD_VERBOSE                               | Int    | Enhanced logging for debugging purpose (1=active / 2=advanced)                                          | 0       |          |
-| OSD_SITE_URL                              | String | Controller url (Example: https://192.168.0.2)                                                           |         | ✔       |
+| OSD_SITE_URL                              | String | Controller url (Example: `https://192.168.0.2`)                                                           |         | ✔       |
 | OSD_SITE_SITE                             | String | Site name as seen in the web interface                                                                  | Default | ✔       |
 | OSD_SITE_USERNAME                         | String | Login username (it is strongly advised to create a seperate account for each application & site)        |         | ✔       |
 | OSD_SITE_PASSWORD                         | String | Login password                                                                                          |         | ✔       |
