@@ -19,13 +19,13 @@ type Crawler struct {
 	cfg     *config.Crawler
 	l       *log.Log
 	domains *domainstore.Domainstore
-	Error   chan (error)
+	Error   chan error
 }
 
-func New(api *omadaclient.SiteClient, cache *cache.Cache, cfg *config.Crawler, verbose bool) *Crawler {
+func New(api *omadaclient.SiteClient, cacheIn *cache.Cache, cfg *config.Crawler, verbose bool) *Crawler {
 	res := Crawler{
 		api:     api,
-		cache:   cache,
+		cache:   cacheIn,
 		cfg:     cfg,
 		l:       log.New("Crawler", verbose),
 		domains: domainstore.New(verbose),
@@ -77,8 +77,11 @@ func (c *Crawler) fetchNetworks() {
 	defer c.api.Close()
 
 	for _, n := range *networks {
-		err := c.domains.AddNetwork(n.Name, n.GatewaySubnet, n.Domain)
-		c.l.V(n.Name, err)
+		if len(n.GatewaySubnet) > 0 {
+			if err := c.domains.AddNetwork(n.Name, n.GatewaySubnet, n.Domain); err != nil {
+				c.l.V(n.Name, err)
+			}
+		}
 	}
 }
 
@@ -95,11 +98,13 @@ func (c *Crawler) fetchHosts() {
 	c.l.V("Fetched Clients:", len(*clients))
 
 	for _, cl := range *clients {
-		domname, ok := c.getDomName(cl.Name, cl.IP)
-		if ok {
-			c.addIfValid(domname, cl.IP)
-		} else {
-			c.l.V("No network found for IP:", cl.IP)
+		if len(cl.IP) > 0 {
+			domname, ok := c.getDomName(cl.Name, cl.IP)
+			if ok {
+				c.addIfValid(domname, cl.IP)
+			} else {
+				c.l.V("No network found for IP:", cl.IP)
+			}
 		}
 	}
 
@@ -112,11 +117,13 @@ func (c *Crawler) fetchHosts() {
 	for _, d := range *devices {
 		if d.Type == "gateway" {
 			for _, lcs := range d.LanClientStats {
-				domname, ok := c.getDomName(d.Name, lcs.IP)
-				if ok {
-					c.addIfValid(domname, lcs.IP)
-				} else {
-					c.l.V("No network found for IP:", lcs.IP)
+				if len(lcs.IP) > 0 {
+					domname, ok := c.getDomName(d.Name, lcs.IP)
+					if ok {
+						c.addIfValid(domname, lcs.IP)
+					} else {
+						c.l.V("No network found for IP:", lcs.IP)
+					}
 				}
 			}
 

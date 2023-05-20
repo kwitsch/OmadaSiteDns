@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/kwitsch/OmadaSiteDns/osdutils"
-	. "github.com/kwitsch/go-dockerutils/config"
+	cfg "github.com/kwitsch/go-dockerutils/config"
 	"github.com/kwitsch/omadaclient/utils"
 )
 
@@ -56,7 +56,7 @@ const prefix = "OSD_"
 
 func Get() (*Config, error) {
 	var res Config
-	if err := Load(prefix, &res); err != nil {
+	if err := cfg.Load(prefix, &res); err != nil {
 		return nil, err
 	}
 

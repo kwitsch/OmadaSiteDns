@@ -13,6 +13,14 @@ import (
 	"github.com/miekg/dns"
 )
 
+const (
+	rdnsSuffix    = ".in-addr.arpa"
+	serverAddress = ":53"
+	udpNet        = "udp"
+	tcpNet        = "tcp"
+	zeroIP        = "0.0.0.0"
+)
+
 type Server struct {
 	udp   *dns.Server
 	tcp   *dns.Server
@@ -20,17 +28,17 @@ type Server struct {
 	cfg   *config.Server
 	l     *log.Log
 	ql    *querylogger.QueryLogger
-	Error chan (error)
+	Error chan error
 }
 
-func New(cache *cache.Cache, cfgs config.Server, cfgl config.Logger, verbose bool) *Server {
+func New(cacheIn *cache.Cache, cfgs config.Server, cfgl config.Logger, verbose bool) *Server {
 	res := &Server{
 		udp:   createUDPServer(),
 		tcp:   createTCPServer(),
-		cache: cache,
+		cache: cacheIn,
 		cfg:   &cfgs,
 		l:     log.New("Server", verbose),
-		ql:    querylogger.New(cfgl, cache, verbose),
+		ql:    querylogger.New(cfgl, cacheIn, verbose),
 		Error: make(chan error, 2),
 	}
 
@@ -56,10 +64,10 @@ func (s *Server) Start() {
 
 func (s *Server) Stop() {
 	if s.cfg.Udp {
-		s.udp.Shutdown()
+		defer s.udp.Shutdown()
 	}
 	if s.cfg.Tcp {
-		s.tcp.Shutdown()
+		defer s.tcp.Shutdown()
 	}
 }
 
@@ -77,8 +85,8 @@ func (s *Server) setupHandlers() {
 
 func createUDPServer() *dns.Server {
 	return &dns.Server{
-		Addr:    ":53",
-		Net:     "udp",
+		Addr:    serverAddress,
+		Net:     udpNet,
 		Handler: dns.NewServeMux(),
 		NotifyStartedFunc: func() {
 			fmt.Println("UDP server is up and running")
@@ -89,8 +97,8 @@ func createUDPServer() *dns.Server {
 
 func createTCPServer() *dns.Server {
 	return &dns.Server{
-		Addr:    ":53",
-		Net:     "tcp",
+		Addr:    serverAddress,
+		Net:     tcpNet,
 		Handler: dns.NewServeMux(),
 		NotifyStartedFunc: func() {
 			fmt.Println("TCP server is up and running")
@@ -98,12 +106,10 @@ func createTCPServer() *dns.Server {
 	}
 }
 
-const rdnsSuf string = ".in-addr.arpa"
-
 func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 	start := time.Now()
 
-	clientip := "0.0.0.0"
+	clientip := zeroIP
 	if w != nil {
 		clientip = resolveClientIP(w.RemoteAddr())
 	}
@@ -118,7 +124,7 @@ func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 		val := ""
 
 		if q.Qtype == dns.TypePTR {
-			crname := strings.TrimSuffix(cname, rdnsSuf)
+			crname := strings.TrimSuffix(cname, rdnsSuffix)
 
 			val, exists = s.cache.GetHostname(crname)
 			if exists {
@@ -175,11 +181,11 @@ func (s *Server) OnRequest(w dns.ResponseWriter, request *dns.Msg) {
 }
 
 func resolveClientIP(addr net.Addr) string {
-	if t, ok := addr.(*net.UDPAddr); ok {
-		return t.IP.String()
+	if u, ok := addr.(*net.UDPAddr); ok {
+		return u.IP.String()
 	} else if t, ok := addr.(*net.TCPAddr); ok {
 		return t.IP.String()
 	}
 
-	return "0.0.0.0"
+	return zeroIP
 }
